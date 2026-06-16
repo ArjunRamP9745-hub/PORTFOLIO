@@ -156,23 +156,17 @@ function syncOverview() {
 
 const stage4 = document.getElementById('stage4');
 
-const overviewObserver = new IntersectionObserver((entries) => {
+function showOverviewAnimation() {
+    const stage4Top = stage4.getBoundingClientRect().top;
+    const screenHeight = window.innerHeight;
 
-    entries.forEach(entry => {
+    if (stage4Top < screenHeight * 0.85) {
+        stage4.classList.add('active-overview');
+    }
+}
 
-        if (entry.isIntersecting) {
-
-            stage4.classList.add('active-overview');
-
-        }
-
-    });
-
-}, {
-    threshold: 0.35
-});
-
-overviewObserver.observe(stage4);
+window.addEventListener('scroll', showOverviewAnimation);
+window.addEventListener('load', showOverviewAnimation);
 
 window.addEventListener('DOMContentLoaded', syncOverview);
 const chatToggle = document.getElementById('chat-toggle');
