@@ -3205,3 +3205,25 @@
         padding-bottom: 200px !important;
     }
 }
+
+/* MOBILE BOTTOM BLANK SPACE FIX */
+@media screen and (max-width: 768px) {
+
+    body {
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
+    }
+
+    .content-column {
+        padding-bottom: 40px !important;
+    }
+
+    #stage4 {
+        padding-bottom: 20px !important;
+        margin-bottom: 30px !important;
+    }
+
+    #stage4 .summary-card:last-child {
+        margin-bottom: 10px !important;
+    }
+}
