@@ -156,17 +156,26 @@ function syncOverview() {
 
 const stage4 = document.getElementById('stage4');
 
-function showOverviewAnimation() {
-    const stage4Top = stage4.getBoundingClientRect().top;
-    const screenHeight = window.innerHeight;
-
-    if (stage4Top < screenHeight * 0.85) {
-        stage4.classList.add('active-overview');
-    }
+// The cards drop into place only once the Overview Summary section has been
+// reached (works for the laptop scroll column and for the phone page scroll).
+// When the section is scrolled completely out of view it resets, so it drops
+// again the next time it is reached.
+if (stage4) {
+    const overviewObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                stage4.classList.add('active-overview');
+            } else {
+                stage4.classList.remove('active-overview');
+            }
+        });
+    }, {
+        threshold: 0,
+        // section counts as "reached" when its top passes the upper ~60% of the screen
+        rootMargin: '0px 0px -40% 0px'
+    });
+    overviewObserver.observe(stage4);
 }
-
-window.addEventListener('scroll', showOverviewAnimation);
-window.addEventListener('load', showOverviewAnimation);
 
 window.addEventListener('DOMContentLoaded', syncOverview);
 const chatToggle = document.getElementById('chat-toggle');
@@ -501,3 +510,55 @@ flyingObserver.observe(stage4Section);
 
 
 
+
+
+// =========================================
+// OVERVIEW SUMMARY: AUTO-FIT TO ONE SCREEN
+// Picks the largest font size at which the whole
+// overview fits the screen without any scrolling.
+// =========================================
+(function () {
+    const sec = document.getElementById('stage4');
+    if (!sec) return;
+    const grid = sec.querySelector(':scope > div');
+    let timer;
+
+    function fits() {
+        if (grid.scrollHeight > grid.clientHeight + 1 ||
+            grid.scrollWidth > grid.clientWidth + 1) return false;
+        // On desktop/laptop the overview has a fixed height, so every card
+        // (and the education boxes inside) must fit inside its own box.
+        // On phones (<=768px) the section grows to its natural height, so skip this.
+        if (window.innerWidth > 768) {
+            const cards = grid.querySelectorAll('.summary-card');
+            for (const card of cards) {
+                if (card.scrollHeight > card.clientHeight + 1) return false;
+            }
+        }
+        return true;
+    }
+
+    function fitOverview() {
+        sec.classList.add('ov-fitting');
+        let lo = 4, hi = Math.min(17, window.innerWidth / 22), best = lo;
+        for (let i = 0; i < 10; i++) {
+            const mid = (lo + hi) / 2;
+            sec.style.setProperty('--ov-fs', mid + 'px');
+            if (fits()) { best = mid; lo = mid; } else { hi = mid; }
+        }
+        sec.style.setProperty('--ov-fs', best + 'px');
+        void sec.offsetHeight;
+        sec.classList.remove('ov-fitting');
+    }
+
+    function queueFit() {
+        clearTimeout(timer);
+        timer = setTimeout(fitOverview, 80);
+    }
+
+    window.addEventListener('load', fitOverview);
+    window.addEventListener('resize', queueFit);
+    window.addEventListener('orientationchange', queueFit);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitOverview);
+    fitOverview();
+})();
