@@ -3450,3 +3450,42 @@ section#stage4.ov-fitting .summary-card {
         transition: none !important;
     }
 }
+
+
+/* PROJECT POPUP - TOUCH DEVICE FIX */
+.project-popup {
+    pointer-events: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.project-popup.active {
+    pointer-events: auto;
+}
+
+/* Desktop hover only */
+@media (hover: hover) and (pointer: fine) {
+    .project-item {
+        cursor: pointer;
+    }
+
+    .project-popup a:hover {
+        transform: translateY(-3px);
+    }
+}
+
+/* Mobile touch behaviour */
+@media (hover: none) and (pointer: coarse) {
+    .project-item:hover {
+        transform: none;
+    }
+
+    .project-popup {
+        transition: opacity 0.2s ease, transform 0.2s ease;
+        touch-action: manipulation;
+    }
+
+    .project-popup a {
+        min-height: 44px;
+        touch-action: manipulation;
+    }
+}
